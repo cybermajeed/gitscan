@@ -4,6 +4,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 echo Scanning for Git repositories...
 echo.
 
+set found=0
 for /f "delims=" %%G in ('
     dir /s /b /ad .git 2^>nul ^
     ^| findstr /I /V "\\node_modules\\ \\.venv\\ \\.next\\ \\dist\\ \\build\\ \\target\\ \\coverage\\"
@@ -11,7 +12,6 @@ for /f "delims=" %%G in ('
 
     set "repo=%%~dpG"
     set "repo=!repo:~0,-1!"
-
     set "hasChanges="
 
     for /f "delims=" %%S in ('
@@ -19,16 +19,20 @@ for /f "delims=" %%G in ('
     ') do (
 
         if not defined hasChanges (
+            set found=1
             echo ==================================================
             echo REPO: !repo!
             echo ==================================================
             set "hasChanges=1"
         )
-
         echo %%S
     )
 
     if defined hasChanges echo.
 )
 
-echo No uncommitted repos found.
+if !found! equ 0 (
+    echo No uncommitted repos found.
+) else (
+    echo Done.
+)

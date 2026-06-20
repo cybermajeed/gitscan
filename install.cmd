@@ -13,11 +13,7 @@ copy "%~dp0gitscan.cmd" "%INSTALL_DIR%\gitscan.cmd" /Y >nul
 
 echo Configuring PATH...
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-"$path=[Environment]::GetEnvironmentVariable('Path','User');" ^
-"if($path -notlike '*%INSTALL_DIR%*'){" ^
-"[Environment]::SetEnvironmentVariable('Path',$path+';%INSTALL_DIR%','User')" ^
-"}"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$path=[Environment]::GetEnvironmentVariable('Path','User'); if($path -notlike '*GitScan*'){[Environment]::SetEnvironmentVariable('Path',$path+';%INSTALL_DIR%','User')}"
 
 echo.
 echo GitScan installed successfully.
