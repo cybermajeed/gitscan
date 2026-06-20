@@ -31,4 +31,4 @@ for /f "delims=" %%G in ('
     if defined hasChanges echo.
 )
 
-echo Done.
+echo No uncommitted repos found.
