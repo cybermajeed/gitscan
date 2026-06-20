@@ -5,6 +5,30 @@ echo Scanning for Git repositories...
 echo.
 
 set found=0
+
+if exist ".git" (
+
+    set "repo=%CD%"
+    set "hasChanges="
+
+    for /f "delims=" %%S in ('
+        git -C "%CD%" status --porcelain 2^>nul
+    ') do (
+
+        if not defined hasChanges (
+            set found=1
+            echo ==================================================
+            echo REPO: %CD%
+            echo ==================================================
+            set "hasChanges=1"
+        )
+
+        echo %%S
+    )
+
+    if defined hasChanges echo.
+)
+
 for /f "delims=" %%G in ('
     dir /s /b /ad .git 2^>nul ^
     ^| findstr /I /V "\\node_modules\\ \\.venv\\ \\.next\\ \\dist\\ \\build\\ \\target\\ \\coverage\\"
@@ -12,23 +36,28 @@ for /f "delims=" %%G in ('
 
     set "repo=%%~dpG"
     set "repo=!repo:~0,-1!"
-    set "hasChanges="
 
-    for /f "delims=" %%S in ('
-        git -C "!repo!" status --porcelain 2^>nul
-    ') do (
+    if /I not "!repo!"=="%CD%" (
 
-        if not defined hasChanges (
-            set found=1
-            echo ==================================================
-            echo REPO: !repo!
-            echo ==================================================
-            set "hasChanges=1"
+        set "hasChanges="
+
+        for /f "delims=" %%S in ('
+            git -C "!repo!" status --porcelain 2^>nul
+        ') do (
+
+            if not defined hasChanges (
+                set found=1
+                echo ==================================================
+                echo REPO: !repo!
+                echo ==================================================
+                set "hasChanges=1"
+            )
+
+            echo %%S
         )
-        echo %%S
-    )
 
-    if defined hasChanges echo.
+        if defined hasChanges echo.
+    )
 )
 
 if !found! equ 0 (
@@ -36,3 +65,5 @@ if !found! equ 0 (
 ) else (
     echo Done.
 )
+
+endlocal
